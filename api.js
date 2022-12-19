@@ -25,8 +25,7 @@ app.get("/products/:id", (req, res) => {
   const { id } = req.params;
   const producto = productoExist(id);
   if (!producto) {
-    res.statusCode = 404;
-    return res.send(`ID ${id} no existe`);
+    return res.status(404).send(`ID ${id} no existe`);
   }
 
   res.json(producto);
@@ -38,27 +37,28 @@ app.post("/products", (req, res) => {
     const newProdruct = { id: productos.length + 1, ...req.body };
     productos.push(newProdruct);
 
-    res.json(newProdruct).status(201);
+    res.status(201).json(newProdruct);
   } else {
-    res
-      .json({
-        message:
-          "No se pudo adicionar Producto, formato invalido, falta algun dato",
-      })
-      .status(400);
+    res.status(400).json({
+      message:
+        "No se pudo adicionar Producto, formato invalido, falta algun dato",
+    });
   }
 });
 //actualizar productos
 app.put("/products/:id", (req, res) => {
   const { id, name, price } = req.body;
-  console.log(id, name, price);
+
   const oldProduct = productoExist(id);
   console.log(oldProduct);
-  if (oldProduct && id && name && price) {
-    productos[productos.indexOf(oldProduct)] = req.body;
-    res.json(req.body).status(201);
+  if (oldProduct) {
+    //productos[productos.indexOf(oldProduct)] = req.body;
+    //asi se puede actualizar solo los campos que mudaron en la otra version
+    //eran todos actualizados
+    productos = productos.map((p) => (p.id == id ? { ...p, ...req.body } : p));
+    res.status(204).json(req.body);
   } else {
-    res.json({ message: "No se pudo actualizar" }).status(400);
+    res.status(400).json({ message: "No se pudo actualizar" });
   }
 });
 
