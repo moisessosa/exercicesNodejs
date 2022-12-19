@@ -47,7 +47,7 @@ app.post("/products", (req, res) => {
 });
 //actualizar productos
 app.put("/products/:id", (req, res) => {
-  const { id, name, price } = req.body;
+  const { id } = req.params;
 
   const oldProduct = productoExist(id);
   console.log(oldProduct);
@@ -56,7 +56,7 @@ app.put("/products/:id", (req, res) => {
     //asi se puede actualizar solo los campos que mudaron en la otra version
     //eran todos actualizados
     productos = productos.map((p) => (p.id == id ? { ...p, ...req.body } : p));
-    res.status(204).json(req.body);
+    res.status(200).json({ id, ...req.body });
   } else {
     res.status(400).json({ message: "No se pudo actualizar" });
   }
