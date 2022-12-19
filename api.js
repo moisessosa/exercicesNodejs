@@ -6,7 +6,11 @@ let productos = [
   { id: 2, name: "mouse", price: 30 },
   { id: 3, name: "Pantalla", price: 400 },
 ];
+function productoExist(id) {
+  return productos.find((p) => p.id == id);
+}
 app.use(express.json());
+//app.use(productoExist());
 app.get("/", (req, res) => {
   res.send(
     "<h2>Bienvenido a esta mini Crud API, que funciona con un array</h2>"
@@ -19,7 +23,12 @@ app.get("/products", (req, res) => {
 // obtener un producto
 app.get("/products/:id", (req, res) => {
   const { id } = req.params;
-  const producto = productos.find((p) => p.id == id);
+  const producto = productoExist(id);
+  if (!producto) {
+    res.statusCode = 404;
+    return res.send(`ID ${id} no existe`);
+  }
+
   res.json(producto);
 });
 //adicionar producto
@@ -40,10 +49,11 @@ app.post("/products", (req, res) => {
   }
 });
 //actualizar productos
-app.put("/products", (req, res) => {
+app.put("/products/:id", (req, res) => {
   const { id, name, price } = req.body;
   console.log(id, name, price);
-  const oldProduct = productos.find((p) => id == p.id);
+  const oldProduct = productoExist(id);
+  console.log(oldProduct);
   if (oldProduct && id && name && price) {
     productos[productos.indexOf(oldProduct)] = req.body;
     res.json(req.body).status(201);
